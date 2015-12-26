@@ -6,7 +6,7 @@ Bind your favourite key combination to this command: `extension.switch_correspon
 (I  like `Alt+O` from Visual Assist in Visual Studio :))
 
 ### For more information
- * https://tomhultonharrop.visualstudio.com/DefaultCollection/_git/switch-corresponding
+ * Check out the source here - https://github.com/pr0g/switch-corresponding
 
 ** Note: No guarantees are made about if it will work 100% of the time! **
 
