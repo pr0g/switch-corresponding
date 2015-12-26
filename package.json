@@ -31,5 +31,6 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/pr0g/switch-corresponding"	
-	}
+	},
+	"iconUrl": "icon/switch-corresponding.png"
 }
