@@ -1,13 +1,13 @@
-# README
-## This is the README for your extension "switch-corresponding" 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+# Switch Corresponding
+ `switch-corresponding` allows you to easily switch between interface and implementation files (.h/.cpp or .m etc) with one command
 
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
+Bind your favourite key combination to this command: `extension.switch_corresponding`
+
+(I  like `Alt+O` from Visual Assist in Visual Studio :))
 
 ### For more information
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+ * https://tomhultonharrop.visualstudio.com/DefaultCollection/_git/switch-corresponding
 
-** Enjoy!**
+** Note: No guarantees are made about if it will work 100% of the time! **
+
+**Enjoy!**
