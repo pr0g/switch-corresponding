@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode'; 
 
+var path = require('path');
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -15,9 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	var disposable = vscode.commands.registerCommand('extension.switch_corresponding', () => {
 		var filePath = vscode.window.activeTextEditor.document.fileName; 
-		var fileNameAndExtension = filePath.substring(filePath.lastIndexOf('/') + 1, filePath.length);
+		var fileNameAndExtension = path.basename(filePath);
 		var fileName = fileNameAndExtension.substring(0, fileNameAndExtension.lastIndexOf('.'));
-		// var fileExtension = fileNameAndExtension.substring(fileNameAndExtension.lastIndexOf('.'), fileNameAndExtension.length);
 		
 		var files = vscode.workspace.findFiles("**/" + fileName + "*", "**/" + fileNameAndExtension, 100);
 		
