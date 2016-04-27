@@ -19,7 +19,18 @@
 		"commands": [{
 			"command": "extension.switch_corresponding",
 			"title": "Switch Corresponding File"
-		}]
+		}],
+       "configuration": {
+            "type": "object",
+            "title": "Switch Corresponding File configuration",
+            "properties": {
+                "switch-corresponding.sameFolder": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Find file in same folder or not (default: false)"
+                }
+			}
+	   }
 	},
 	"scripts": {
 		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
@@ -31,6 +42,6 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pr0g/switch-corresponding"	
+		"url": "https://github.com/pr0g/switch-corresponding"
 	}
 }

@@ -1,6 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode'; 
+import * as vscode from 'vscode';
 
 var path = require('path');
 
@@ -10,18 +10,35 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('"switch-corresponding" now active'); 
+	console.log('"switch-corresponding" now active');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
 	var disposable = vscode.commands.registerCommand('extension.switch_corresponding', () => {
-		var filePath = vscode.window.activeTextEditor.document.fileName; 
+		var filePath = vscode.window.activeTextEditor.document.fileName;
 		var fileNameAndExtension = path.basename(filePath);
-		var fileName = fileNameAndExtension.substring(0, fileNameAndExtension.lastIndexOf('.'));
-		
-		var files = vscode.workspace.findFiles("**/" + fileName + "*", "**/" + fileNameAndExtension, 100);
-		
+		var	fileName = path.basename(filePath, path.extname(filePath));
+
+		if (<boolean>vscode.workspace.getConfiguration('switch-corresponding').get('sameFolder')) {
+			// Search in same folder
+			// Add '.' in fileName because unit.pas must not switch to unit_3.pas
+			fileName = fileName +'.*';
+			// build relative path
+			let dir = path.dirname(filePath),
+				relative = vscode.workspace.asRelativePath(dir);
+			if (dir !== relative) {
+				fileName = path.join(relative, fileName).substr(1).replace(/\\/g, '/');
+				fileNameAndExtension = path.join(relative, fileNameAndExtension).substr(1).replace(/\\/g, '/');
+			}
+		} else {
+			// Search in all folders
+			fileName = "**/" + fileName + "*";
+			fileNameAndExtension =  "**/" + fileNameAndExtension;
+		}
+
+		var files = vscode.workspace.findFiles(fileName, fileNameAndExtension, 100);
+
 		files.then((value) => {
 			for (var i = 0; i < value.length; ++i) {
 				var textDocument = vscode.workspace.openTextDocument(value[i]);
@@ -33,9 +50,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}, (reason) => {
 			console.log(reason);
 		});
-		
+
 	});
-	
+
 	context.subscriptions.push(disposable);
 }
 
