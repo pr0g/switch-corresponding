@@ -23,6 +23,9 @@ export function activate(context: vscode.ExtensionContext) {
 		var files = vscode.workspace.findFiles("**/" + fileName + "*", "**/" + fileNameAndExtension, 100);
 
 		files.then((files) => {
+            if (!files || !files.length) {
+                return;
+            }
 
             if (files.length === 1) {
                 // if only one file => switch
