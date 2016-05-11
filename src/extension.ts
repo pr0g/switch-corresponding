@@ -27,9 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
                 return;
             }
 
-            if (files.length === 1) {
+            // only want files whose name matches exactly
+            let exact_files = files.filter(file => path.basename(file, path.extname(file)) === fileName);
+            if (!exact_files || !exact_files.length) {
+                return;
+            }
+
+            if (exact_files.length === 1) {
                 // if only one file => switch
-                vscode.workspace.openTextDocument(files[0].fsPath)
+                vscode.workspace.openTextDocument(exact_files[0].fsPath)
                     .then(textDoc => {
                         vscode.window.showTextDocument(textDoc);
                     });
@@ -37,8 +43,8 @@ export function activate(context: vscode.ExtensionContext) {
                 // else => list and open only the file selected by user
                 let displayFiles = [];
 
-                for (let index = 0, file; index < files.length; index++) {
-                    file = files[index];
+                for (let index = 0, file; index < exact_files.length; index++) {
+                    file = exact_files[index];
                     displayFiles.push({
                         label: file.fsPath.substring(vscode.workspace.rootPath.length + 1),
                         description: file.fsPath,
