@@ -12,25 +12,18 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.switch_corresponding"
+		"onCommand:extension.switch_corresponding",
+		"onCommand:extension.switch_corresponding_sameDirectory"
 	],
 	"main": "./out/src/extension",
 	"contributes": {
 		"commands": [{
 			"command": "extension.switch_corresponding",
 			"title": "Switch Corresponding File"
-		}],
-       "configuration": {
-            "type": "object",
-            "title": "Switch Corresponding File configuration",
-            "properties": {
-                "switch-corresponding.sameFolder": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Find file in same folder or not (default: false)"
-                }
-			}
-	   }
+		}, {
+			"command": "extension.switch_corresponding_sameDirectory",
+			"title": "Switch Corresponding File (same directory)"
+		}]
 	},
 	"scripts": {
 		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
