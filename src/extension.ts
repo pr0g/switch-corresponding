@@ -16,44 +16,82 @@ export function activate(context: vscode.ExtensionContext) {
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
 
-	var disposable = vscode.commands.registerCommand('extension.switch_corresponding', () => switch_corresponding() );
-	context.subscriptions.push(disposable);
-	var disposable = vscode.commands.registerCommand('extension.switch_corresponding_sameDirectory', () => switch_corresponding(true) );
-	context.subscriptions.push(disposable);
+	var disposable_sc = vscode.commands.registerCommand('extension.switch_corresponding', () => switch_corresponding() );
+	context.subscriptions.push(disposable_sc);
+	var disposable_sc_samedir = vscode.commands.registerCommand('extension.switch_corresponding_sameDirectory', () => switch_corresponding(true) );
+	context.subscriptions.push(disposable_sc_samedir);
 
 	function switch_corresponding(sameDirectory?: boolean) {
-
 		var filePath = vscode.window.activeTextEditor.document.fileName;
 		var fileNameAndExtension = path.basename(filePath);
-		var	fileName = path.basename(filePath, path.extname(filePath));
+		// the exact filename
+		var fileName = path.basename(filePath, path.extname(filePath));
 
+		// the filename + search criteria to use for matching
+		var fileNameSearch = "";
 		if (sameDirectory) {
 			// build relative path
 			let dir = path.dirname(filePath),
 				relative = vscode.workspace.asRelativePath(dir);
 			if (dir !== relative) {
-				fileName = path.join(relative, fileName).substr(1).replace(/\\/g, '/');
+				fileNameSearch = path.join(relative, fileName).substr(1).replace(/\\/g, '/');
 				fileNameAndExtension = path.join(relative, fileNameAndExtension).substr(1).replace(/\\/g, '/');
+			} else {
+				fileNameSearch = fileName;
 			}
-			fileName = fileName + ".*";
+			fileNameSearch += ".*";
 		} else {
-			fileName = "**/" + fileName + ".*";
+			fileNameSearch = "**/" + fileName + ".*";
 			fileNameAndExtension =  "**/" + fileNameAndExtension;
 		}
 
-		var files = vscode.workspace.findFiles(fileName, fileNameAndExtension, 100);
-		files.then((value) => {
-			for (var i = 0; i < value.length; ++i) {
-				var textDocument = vscode.workspace.openTextDocument(value[i]);
-				textDocument.then((textDoc) => {
-					vscode.window.showTextDocument(textDoc);
-				});
-				break;
+		var files = vscode.workspace.findFiles(fileNameSearch, fileNameAndExtension, 100);
+
+		files.then((files) => {
+	        if (!files || files.length == 0) {
+				return;
 			}
-		}, (reason) => {
-			console.log(reason);
+
+			// only want files whose name matches exactly
+			let exact_files = files.filter(file => path.basename(file, path.extname(file)) === fileName);
+			if (!exact_files || exact_files.length == 0) {
+				return;
+			}
+
+			if (exact_files.length === 1) {
+				// if only one file => switch
+				vscode.workspace.openTextDocument(exact_files[0].fsPath)
+					.then(textDoc => {
+						vscode.window.showTextDocument(textDoc);
+					});
+			} else {
+				// else => list and open only the file selected by user
+				let displayFiles = [];
+
+				for (let index = 0, file; index < exact_files.length; index++) {
+					file = exact_files[index];
+					displayFiles.push({
+						label: file.fsPath.substring(vscode.workspace.rootPath.length + 1),
+						description: file.fsPath,
+						filePath: file.fsPath
+					});
+				}
+
+				vscode.window.showQuickPick(displayFiles)
+					.then(val=> {
+						if (val) {
+							vscode.workspace.openTextDocument(val.filePath)
+								.then(textDoc => {
+									vscode.window.showTextDocument(textDoc);
+								});
+						}
+					});
+	            }
+
+			}, (reason) => {
+				console.log(reason);
 		});
-	}
+	};
 }
 
 // this method is called when your extension is deactivated
