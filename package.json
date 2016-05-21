@@ -13,7 +13,7 @@
 	],
 	"activationEvents": [
 		"onCommand:extension.switch_corresponding",
-		"onCommand:extension.switch_corresponding_sameDirectory"
+		"onCommand:extension.switch_corresponding_same_dir"
 	],
 	"main": "./out/src/extension",
 	"contributes": {
@@ -21,7 +21,7 @@
 			"command": "extension.switch_corresponding",
 			"title": "Switch Corresponding File"
 		}, {
-			"command": "extension.switch_corresponding_sameDirectory",
+			"command": "extension.switch_corresponding_same_dir",
 			"title": "Switch Corresponding File (same directory)"
 		}]
 	},
