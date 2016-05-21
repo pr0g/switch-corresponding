@@ -12,13 +12,17 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.switch_corresponding"
+		"onCommand:extension.switch_corresponding",
+		"onCommand:extension.switch_corresponding_sameDirectory"
 	],
 	"main": "./out/src/extension",
 	"contributes": {
 		"commands": [{
 			"command": "extension.switch_corresponding",
 			"title": "Switch Corresponding File"
+		}, {
+			"command": "extension.switch_corresponding_sameDirectory",
+			"title": "Switch Corresponding File (same directory)"
 		}]
 	},
 	"scripts": {
@@ -31,6 +35,6 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pr0g/switch-corresponding"	
+		"url": "https://github.com/pr0g/switch-corresponding"
 	}
 }
