@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-var path = require('path');
+var Path = require('path');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -22,32 +22,41 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable_sc_samedir);
 
 	function switch_corresponding(same_dir?: boolean) {
-		var file_path = vscode.window.activeTextEditor.document.fileName;
-		var file_name_and_extension = path.basename(file_path);
+		var filepath = vscode.window.activeTextEditor.document.fileName;
+		var filename_and_extension = Path.basename(filepath);
 		// the exact filename
-		var file_name = path.basename(file_path, path.extname(file_path));
+		var filename = Path.basename(filepath, Path.extname(filepath));
+
+		// returns directory name of a path
+		let absolute_path = Path.dirname(filepath);
+		// returns a path that is relative to the workspace root
+		// or the absolute path to the root (if file is at root level)
+		let relative_path_or_root = vscode.workspace.asRelativePath(absolute_path);
+
+		// note: replace(/\\/g, '/') statement is a regex search for all backslashes `\`
+		// in path, it then replaces each with a forward slash '/' -- (start and ending '/'
+		// encase regex, 'g' matches all occurunces not just first)
+
+		// if we got a relative directory, filename_and_extension is the whole
+		// relative path to the file (so we know it's unique)
+		if (absolute_path !== relative_path_or_root)
+			filename_and_extension = Path.join(relative_path_or_root, filename_and_extension).substr(1).replace(/\\/g, '/');
 
 		// the filename + search criteria to use for matching
-		var file_name_search = "";
-		// build relative path
-		let dir = path.dirname(file_path),
-			relative = vscode.workspace.asRelativePath(dir);
-
-		if (dir !== relative)
-			file_name_and_extension = path.join(relative, file_name_and_extension).substr(1).replace(/\\/g, '/');
-
+		var filename_search = "";
+		// limiting search to same directory
 		if (same_dir) {
-			if (dir !== relative) {
-				file_name_search = path.join(relative, file_name).substr(1).replace(/\\/g, '/');
+			if (absolute_path !== relative_path_or_root) {
+				filename_search = Path.join(relative_path_or_root, filename).substr(1).replace(/\\/g, '/');
 			} else {
-				file_name_search = file_name;
+				filename_search = filename;
 			}
-			file_name_search += ".*";
+			filename_search += ".*";
 		} else {
-			file_name_search = "**/" + file_name + ".*";
+			filename_search = "**/" + filename + ".*";
 		}
 
-		var files = vscode.workspace.findFiles(file_name_search, file_name_and_extension, 100);
+		var files = vscode.workspace.findFiles(filename_search, filename_and_extension, 100);
 
 		files.then((files) => {
 	        if (!files || files.length == 0) {
@@ -55,7 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// only want files whose name matches exactly
-			let exact_files = files.filter(file => path.basename(file, path.extname(file)) === file_name);
+			let exact_files = files.filter(file => Path.basename(file, Path.extname(file)) === filename);
 			if (!exact_files || exact_files.length == 0) {
 				return;
 			}
@@ -80,7 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 
 				vscode.window.showQuickPick(display_files)
-					.then(val=> {
+					.then(val => {
 						if (val) {
 							vscode.workspace.openTextDocument(val.filePath)
 								.then(textDoc => {
