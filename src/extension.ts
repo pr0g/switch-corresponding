@@ -29,20 +29,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// the filename + search criteria to use for matching
 		var file_name_search = "";
+		// build relative path
+		let dir = path.dirname(file_path),
+			relative = vscode.workspace.asRelativePath(dir);
+
+		if (dir !== relative)
+			file_name_and_extension = path.join(relative, file_name_and_extension).substr(1).replace(/\\/g, '/');
+
 		if (same_dir) {
-			// build relative path
-			let dir = path.dirname(file_path),
-				relative = vscode.workspace.asRelativePath(dir);
 			if (dir !== relative) {
 				file_name_search = path.join(relative, file_name).substr(1).replace(/\\/g, '/');
-				file_name_and_extension = path.join(relative, file_name_and_extension).substr(1).replace(/\\/g, '/');
 			} else {
 				file_name_search = file_name;
 			}
 			file_name_search += ".*";
 		} else {
 			file_name_search = "**/" + file_name + ".*";
-			file_name_and_extension =  "**/" + file_name_and_extension;
 		}
 
 		var files = vscode.workspace.findFiles(file_name_search, file_name_and_extension, 100);
