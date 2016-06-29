@@ -56,7 +56,19 @@ export function activate(context: vscode.ExtensionContext) {
 			filename_search = "**/" + filename + ".*";
 		}
 
-		var files = vscode.workspace.findFiles(filename_search, filename_and_extension, 100);
+		let search_config = vscode.workspace.getConfiguration( "search" );
+		let search_exclude_settings = search_config.get( "exclude" );
+		let exclude_files = "{";
+
+		for ( var exclude in search_exclude_settings ) {
+			if( search_exclude_settings.hasOwnProperty( exclude ) ) {
+				exclude_files += exclude + ",";
+			}
+		}
+		
+		exclude_files += filename_and_extension + "}";
+
+		var files = vscode.workspace.findFiles(filename_search, exclude_files, 100);
 
 		files.then((files) => {
 	        if (!files || files.length == 0) {
@@ -70,13 +82,13 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			if (exact_files.length === 1) {
-				// if only one file => switch
+				// if only one file - switch
 				vscode.workspace.openTextDocument(exact_files[0].fsPath)
 					.then(textDoc => {
 						vscode.window.showTextDocument(textDoc);
 					});
 			} else {
-				// else => list and open only the file selected by user
+				// list and open only the file selected by user
 				let display_files = [];
 
 				for (let index = 0, file; index < exact_files.length; index++) {
