@@ -19,10 +19,10 @@
 	"contributes": {
 		"commands": [{
 			"command": "extension.switch_corresponding",
-			"title": "Switch Corresponding File"
+			"title": "switch-corresponding: switch corresponding file (project)"
 		}, {
 			"command": "extension.switch_corresponding_same_dir",
-			"title": "Switch Corresponding File (same directory)"
+			"title": "switch-corresponding: switch corresponding file (same directory)"
 		}]
 	},
 	"scripts": {
