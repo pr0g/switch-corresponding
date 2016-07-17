@@ -2,7 +2,7 @@
 	"name": "switch-corresponding",
 	"displayName": "switch-corresponding",
 	"description": "switch between .h and .cpp files",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"publisher": "tomhultonharrop",
 	"icon": "icon/switch-corresponding.png",
 	"engines": {
