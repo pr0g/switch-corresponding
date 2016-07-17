@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 				exclude_files += exclude + ",";
 			}
 		}
-		
+
 		exclude_files += filename_and_extension + "}";
 
 		var files = vscode.workspace.findFiles(filename_search, exclude_files, 100);
@@ -85,7 +85,8 @@ export function activate(context: vscode.ExtensionContext) {
 				// if only one file - switch
 				vscode.workspace.openTextDocument(exact_files[0].fsPath)
 					.then(textDoc => {
-						vscode.window.showTextDocument(textDoc);
+						let column = vscode.window.activeTextEditor.viewColumn;
+						vscode.window.showTextDocument(textDoc, column);
 					});
 			} else {
 				// list and open only the file selected by user
@@ -105,7 +106,8 @@ export function activate(context: vscode.ExtensionContext) {
 						if (val) {
 							vscode.workspace.openTextDocument(val.filePath)
 								.then(textDoc => {
-									vscode.window.showTextDocument(textDoc);
+									let column = vscode.window.activeTextEditor.viewColumn;
+									vscode.window.showTextDocument(textDoc, column);
 								});
 						}
 					});
