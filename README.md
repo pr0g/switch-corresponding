@@ -1,6 +1,8 @@
 # Switch Corresponding
  `switch-corresponding` allows you to easily switch between interface and implementation files (.h/.cpp or .m etc) with one command
 
+![Example](misc/vscode-switch-corresponding-preview.gif)
+
 Bind your favourite key combination to this command: `extension.switch_corresponding` and `extension.switch_corresponding_same_dir` (to limit switch search to the same directory)
 
 (I  like `Alt+O` from Visual Assist in Visual Studio :))
