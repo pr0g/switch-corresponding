@@ -13,7 +13,12 @@ If you hit F1, and start typing install, you should see an option for `Shell Com
 
 ### For more information
  * Check out the source here - https://github.com/pr0g/switch-corresponding
+ * Note: When cloning the repro - make sure to run `npm install` at the project root to be able to run the project from the vscode debugger. 
+  	* Once you have done that, open vscode with `vscode .` from the command line at the folder you cloned the repro into, open `src/extension.ts` and hit F5!
 
 ** Note: No guarantees are made about if it will work 100% of the time! **
+
+## Updates
+10/09/2016 - fix incompatibility with latest VSCode update (v1.5.1) where `vscode.workspace.asRelativePath` no longer returned absolute path to workspace root when at workspace root level, but `""`
 
 **Enjoy!**
