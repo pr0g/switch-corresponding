@@ -22,40 +22,36 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable_sc_samedir);
 
 	function switch_corresponding(same_dir?: boolean) {
-		var filepath = vscode.window.activeTextEditor.document.fileName;
-		var filename_and_extension = Path.basename(filepath);
-		// the exact filename
-		var filename = Path.basename(filepath, Path.extname(filepath));
-
-		// returns directory name of a path
-		let absolute_path = Path.dirname(filepath);
-		// returns a path that is relative to the workspace root
-		// or the absolute path to the root (if file is at root level)
-		let relative_path_or_root = vscode.workspace.asRelativePath(absolute_path);
+		var absolute_filename = vscode.window.activeTextEditor.document.fileName;
+		
+		var filename = Path.basename(absolute_filename, Path.extname(absolute_filename));
+		var filename_and_extension = Path.basename(absolute_filename);
 
 		// note: replace(/\\/g, '/') statement is a regex search for all backslashes `\`
 		// in path, it then replaces each with a forward slash '/' -- (start and ending '/'
 		// encase regex, 'g' matches all occurunces not just first)
 
-		// if we got a relative directory, filename_and_extension is the whole
-		// relative path to the file (so we know it's unique)
-		if (absolute_path !== relative_path_or_root)
-			filename_and_extension = Path.join(relative_path_or_root, filename_and_extension).substr(1).replace(/\\/g, '/');
+		// returns directory name of a path
+		let absolute_dir = Path.dirname(absolute_filename);
+		// note: here `normalised` refers to ensuring all separator characters
+		// are forward slashes (/) not backward slashes (\)
+		let relative_dir = vscode.workspace.asRelativePath(absolute_dir);
+		let normalised_relative_dir = relative_dir.replace(/\\/g, '/');
+		let normalised_relative_filename = Path.join(relative_dir, filename);
+		let normalised_relative_filename_and_extension = Path.join(relative_dir, filename_and_extension);
 
 		// the filename + search criteria to use for matching
 		var filename_search = "";
-		// limiting search to same directory
+		
 		if (same_dir) {
-			if (absolute_path !== relative_path_or_root) {
-				filename_search = Path.join(relative_path_or_root, filename).substr(1).replace(/\\/g, '/');
-			} else {
-				filename_search = filename;
-			}
-			filename_search += ".*";
+			// limiting search to same directory
+			filename_search = normalised_relative_filename + ".*";
 		} else {
+			// search entire workspace
 			filename_search = "**/" + filename + ".*";
 		}
 
+		// don't include files excluded form the workspace
 		let search_config = vscode.workspace.getConfiguration( "search" );
 		let search_exclude_settings = search_config.get( "exclude" );
 		let exclude_files = "{";
@@ -66,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 
-		exclude_files += filename_and_extension + "}";
+		exclude_files += normalised_relative_filename_and_extension + "}";
 
 		var files = vscode.workspace.findFiles(filename_search, exclude_files, 100);
 
