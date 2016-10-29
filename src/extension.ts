@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	function switch_corresponding(same_dir?: boolean) {
 		var absolute_filename = vscode.window.activeTextEditor.document.fileName;
-		
+
 		var filename = Path.basename(absolute_filename, Path.extname(absolute_filename));
 		var filename_and_extension = Path.basename(absolute_filename);
 
@@ -33,16 +33,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// returns directory name of a path
 		let absolute_dir = Path.dirname(absolute_filename);
-		// note: here `normalised` refers to ensuring all separator characters
-		// are forward slashes (/) not backward slashes (\)
 		let relative_dir = vscode.workspace.asRelativePath(absolute_dir);
-		let normalised_relative_dir = relative_dir.replace(/\\/g, '/');
-		let normalised_relative_filename = Path.join(relative_dir, filename);
-		let normalised_relative_filename_and_extension = Path.join(relative_dir, filename_and_extension);
+
+		let normalised_relative_filename;
+		let normalised_relative_filename_and_extension;
+		if (absolute_dir !== relative_dir) {
+			// note: here `normalised` refers to ensuring all separator characters
+			// are forward slashes (/) not backward slashes (\)
+			// important: replace must be done at the end, Path.join() build a path with backward slashes (\)
+			normalised_relative_filename = Path.join(relative_dir, filename).replace(/\\/g, '/');
+			normalised_relative_filename_and_extension = Path.join(relative_dir, filename_and_extension).replace(/\\/g, '/');
+		} else {
+			// Important: if it's a file in root relative_dir is not a relative path, but the same as an absolute path
+			// Here we need the file without any path
+			normalised_relative_filename = filename;
+			normalised_relative_filename_and_extension = filename_and_extension;
+		}
 
 		// the filename + search criteria to use for matching
 		var filename_search = "";
-		
+
 		if (same_dir) {
 			// limiting search to same directory
 			filename_search = normalised_relative_filename + ".*";
@@ -72,7 +82,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// only want files whose name matches exactly
-			let exact_files = files.filter(file => Path.basename(file, Path.extname(file)) === filename);
+			let exact_files = files.filter(file => Path.basename(file.fsPath, Path.extname(file.fsPath)) === filename);
 			if (!exact_files || exact_files.length == 0) {
 				return;
 			}
