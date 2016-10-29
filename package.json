@@ -6,7 +6,7 @@
 	"publisher": "tomhultonharrop",
 	"icon": "icon/switch-corresponding.png",
 	"engines": {
-		"vscode": "^1.5.1"
+		"vscode": "^1.6.1"
 	},
 	"categories": [
 		"Other"
