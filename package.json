@@ -2,9 +2,10 @@
 	"name": "switch-corresponding",
 	"displayName": "switch-corresponding",
 	"description": "switch between .h and .cpp files",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"publisher": "tomhultonharrop",
 	"icon": "icon/switch-corresponding.png",
+	"license" : "MIT",
 	"engines": {
 		"vscode": "^1.10.2"
 	},
