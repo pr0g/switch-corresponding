@@ -32,8 +32,8 @@ export function activate(context: vscode.ExtensionContext) {
 		// encase regex, 'g' matches all occurunces not just first)
 
 		// returns directory name of a path
-		let absolute_dir = Path.dirname(absolute_filename);
-		let relative_dir = vscode.workspace.asRelativePath(absolute_dir);
+		let absolute_dir = Path.dirname(absolute_filename).replace(/\\/g, '/');
+		let relative_dir = vscode.workspace.asRelativePath(absolute_dir).replace(/\\/g, '/');
 
 		let normalised_relative_filename;
 		let normalised_relative_filename_and_extension;
