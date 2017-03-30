@@ -21,6 +21,8 @@ If you hit F1 from inside vscode, and start typing install, you should see an op
 ** Note: No guarantees are made about if it will work 100% of the time! **
 
 ## Updates
+30/03/2017 - merge PR from *zabel-xyz* to fix (another) issue with vscode absolute/relative paths (on windows)
+
 29/10/2016 - merge PR from *zabel-xyz* to fix new issue with vscode absolute/relative paths
 
 10/09/2016 - fix incompatibility with latest VSCode update (v1.5.1) where `vscode.workspace.asRelativePath` no longer returned absolute path to workspace root when at workspace root level, but `""`
