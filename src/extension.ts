@@ -6,7 +6,6 @@ import * as path from 'path';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('"switch-corresponding" now active');
@@ -26,25 +25,28 @@ export function activate(context: vscode.ExtensionContext) {
 		var filename = path.basename(absolute_filename, path.extname(absolute_filename));
 		var filename_and_extension = path.basename(absolute_filename);
 
-		// note: replace(/\\/g, '/') statement is a regex search for all backslashes `\`
+		// note: .replace(/\\/g, '/') statement is a regex search for all backslashes `\`
 		// in path, it then replaces each with a forward slash '/' -- (start and ending '/'
 		// encase regex, 'g' matches all occurunces not just first)
 
-		// returns directory name of a path
+		// returns name of directory which contains file
 		let absolute_dir = path.dirname(absolute_filename).replace(/\\/g, '/');
-		let relative_dir = vscode.workspace.asRelativePath(absolute_dir).replace(/\\/g, '/');
+		// note: vscode.workspace.asRelativePath will return absolute path if
+		// active file is at the root of the workspace, otherwise a relative path
+		// from the root of the workspace will be returned
+		let relative_dir = vscode.workspace.asRelativePath(absolute_dir);
 
 		let normalised_relative_filename;
 		let normalised_relative_filename_and_extension;
 		if (absolute_dir !== relative_dir) {
 			// note: here `normalised` refers to ensuring all separator characters
 			// are forward slashes (/) not backward slashes (\)
-			// important: replace must be done at the end, Path.join() build a path with backward slashes (\)
+			// important: replace must be done at the end, path.join() build a path with backward slashes (\)
 			normalised_relative_filename = path.join(relative_dir, filename).replace(/\\/g, '/');
 			normalised_relative_filename_and_extension = path.join(relative_dir, filename_and_extension).replace(/\\/g, '/');
 		} else {
-			// Important: if it's a file in root relative_dir is not a relative path, but the same as an absolute path
-			// Here we need the file without any path
+			// important: if it's a file in root relative_dir is not a relative path, but the same as an absolute path
+			// here we need the file without any path
 			normalised_relative_filename = filename;
 			normalised_relative_filename_and_extension = filename_and_extension;
 		}
