@@ -1,8 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-
-var Path = require('path');
+import * as path from 'path';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,15 +23,15 @@ export function activate(context: vscode.ExtensionContext) {
 	function switch_corresponding(same_dir?: boolean) {
 		var absolute_filename = vscode.window.activeTextEditor.document.fileName;
 
-		var filename = Path.basename(absolute_filename, Path.extname(absolute_filename));
-		var filename_and_extension = Path.basename(absolute_filename);
+		var filename = path.basename(absolute_filename, path.extname(absolute_filename));
+		var filename_and_extension = path.basename(absolute_filename);
 
 		// note: replace(/\\/g, '/') statement is a regex search for all backslashes `\`
 		// in path, it then replaces each with a forward slash '/' -- (start and ending '/'
 		// encase regex, 'g' matches all occurunces not just first)
 
 		// returns directory name of a path
-		let absolute_dir = Path.dirname(absolute_filename).replace(/\\/g, '/');
+		let absolute_dir = path.dirname(absolute_filename).replace(/\\/g, '/');
 		let relative_dir = vscode.workspace.asRelativePath(absolute_dir).replace(/\\/g, '/');
 
 		let normalised_relative_filename;
@@ -41,8 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
 			// note: here `normalised` refers to ensuring all separator characters
 			// are forward slashes (/) not backward slashes (\)
 			// important: replace must be done at the end, Path.join() build a path with backward slashes (\)
-			normalised_relative_filename = Path.join(relative_dir, filename).replace(/\\/g, '/');
-			normalised_relative_filename_and_extension = Path.join(relative_dir, filename_and_extension).replace(/\\/g, '/');
+			normalised_relative_filename = path.join(relative_dir, filename).replace(/\\/g, '/');
+			normalised_relative_filename_and_extension = path.join(relative_dir, filename_and_extension).replace(/\\/g, '/');
 		} else {
 			// Important: if it's a file in root relative_dir is not a relative path, but the same as an absolute path
 			// Here we need the file without any path
@@ -82,7 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// only want files whose name matches exactly
-			let exact_files = files.filter(file => Path.basename(file.fsPath, Path.extname(file.fsPath)) === filename);
+			let exact_files = files.filter(file => path.basename(file.fsPath, path.extname(file.fsPath)) === filename);
 			if (!exact_files || exact_files.length == 0) {
 				return;
 			}
