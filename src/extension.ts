@@ -29,24 +29,23 @@ export function activate(context: vscode.ExtensionContext) {
 		// in path, it then replaces each with a forward slash '/' -- (start and ending '/'
 		// encase regex, 'g' matches all occurunces not just first)
 
-		// returns name of directory which contains file
+		// returns the name of the directory which contains the file
+		// note: ensure all separator characters are forward slashes (/) not backward slashes (\)
 		let absolute_dir = path.dirname(absolute_filename).replace(/\\/g, '/');
-		// note: vscode.workspace.asRelativePath will return absolute path if
-		// active file is at the root of the workspace, otherwise a relative path
-		// from the root of the workspace will be returned
+		// note: vscode.workspace.asRelativePath will return absolute path (input absolute_dir) if
+		// active file is at the root of the workspace, otherwise a relative path from the root of 
+		// the workspace will be returned
 		let relative_dir = vscode.workspace.asRelativePath(absolute_dir);
 
 		let normalised_relative_filename;
 		let normalised_relative_filename_and_extension;
 		if (absolute_dir !== relative_dir) {
-			// note: here `normalised` refers to ensuring all separator characters
-			// are forward slashes (/) not backward slashes (\)
-			// important: replace must be done at the end, path.join() build a path with backward slashes (\)
+			// important: replace must be done at the end, path.join() will build a path with backward slashes (\)
 			normalised_relative_filename = path.join(relative_dir, filename).replace(/\\/g, '/');
 			normalised_relative_filename_and_extension = path.join(relative_dir, filename_and_extension).replace(/\\/g, '/');
 		} else {
-			// important: if it's a file in root relative_dir is not a relative path, but the same as an absolute path
-			// here we need the file without any path
+			// important: if it's a file at the root, relative_dir is not a relative path, but the same as an absolute path
+			// here we need the filename without any path
 			normalised_relative_filename = filename;
 			normalised_relative_filename_and_extension = filename_and_extension;
 		}
