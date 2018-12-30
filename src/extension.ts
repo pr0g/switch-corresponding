@@ -8,82 +8,89 @@ import * as path from 'path';
 export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('"switch-corresponding" now active');
+	// console.log('"switch-corresponding" now active');
+
+	const enum ESwitchMode {
+		All = 0,
+		Same_Workspace,
+		Same_Dir
+	}
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
 
-	var disposable_sc = vscode.commands.registerCommand('extension.switch_corresponding', () => switch_corresponding() );
-	context.subscriptions.push(disposable_sc);
-	var disposable_sc_samedir = vscode.commands.registerCommand('extension.switch_corresponding_same_dir', () => switch_corresponding(true) );
-	context.subscriptions.push(disposable_sc_samedir);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.switch_corresponding', () => switch_corresponding() ));
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.switch_corresponding_same_dir', () => switch_corresponding(ESwitchMode.Same_Dir) ));
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.switch_corresponding_same_workspace', () => switch_corresponding(ESwitchMode.Same_Workspace) ));
 
-	function switch_corresponding(same_dir?: boolean) {
-		var absolute_filename = vscode.window.activeTextEditor.document.fileName;
+	function switch_corresponding(mode: ESwitchMode = ESwitchMode.All ) {
 
-		var filename = path.basename(absolute_filename, path.extname(absolute_filename));
-		var filename_and_extension = path.basename(absolute_filename);
+		const absolute_uri = vscode.window.activeTextEditor.document.uri;
+		const absolute_filename = absolute_uri.fsPath;
 
-		// note: .replace(/\\/g, '/') statement is a regex search for all backslashes `\`
-		// in path, it then replaces each with a forward slash '/' -- (start and ending '/'
-		// encase regex, 'g' matches all occurunces not just first)
+		const filename = path.basename(absolute_filename, path.extname(absolute_filename));
 
-		// returns the name of the directory which contains the file
-		// note: ensure all separator characters are forward slashes (/) not backward slashes (\)
-		let absolute_dir = path.dirname(absolute_filename).replace(/\\/g, '/');
-		// note: vscode.workspace.asRelativePath will return absolute path (input absolute_dir) if
-		// active file is at the root of the workspace, otherwise a relative path from the root of 
-		// the workspace will be returned
-		let relative_dir = vscode.workspace.asRelativePath(absolute_dir);
+		const getNormalisedRelativeFilename = (wsfolder) => {
+			const fp = path.dirname(absolute_filename);
 
-		let normalised_relative_filename;
-		let normalised_relative_filename_and_extension;
-		if (absolute_dir !== relative_dir) {
-			// important: replace must be done at the end, path.join() will build a path with backward slashes (\)
-			normalised_relative_filename = path.join(relative_dir, filename).replace(/\\/g, '/');
-			normalised_relative_filename_and_extension = path.join(relative_dir, filename_and_extension).replace(/\\/g, '/');
-		} else {
-			// important: if it's a file at the root, relative_dir is not a relative path, but the same as an absolute path
-			// here we need the filename without any path
-			normalised_relative_filename = filename;
-			normalised_relative_filename_and_extension = filename_and_extension;
-		}
+			let res = fp.slice(wsfolder.fsPath.length);
+			if (res.charAt(0) === '\\' || '/')  // linux or windows
+			    res = res.slice(1);
+			return path.join(res, filename).replace(/\\/g, '/'); // use only character / for glob usage
+  		};
 
 		// the filename + search criteria to use for matching
-		var filename_search = "";
-
-		if (same_dir) {
-			// limiting search to same directory
-			filename_search = normalised_relative_filename + ".*";
+		let filename_search: string;
+		let relativePattern: vscode.RelativePattern;
+		if (mode !== ESwitchMode.All) {
+			const wsfolder = vscode.workspace.getWorkspaceFolder(absolute_uri);
+			if (!wsfolder) {
+				vscode.window.showErrorMessage(`No workspace for ${absolute_filename}`);
+				return;
+			}
+			// limiting search to same directory (in same workspace folder)
+			if (mode === ESwitchMode.Same_Dir)
+				filename_search = getNormalisedRelativeFilename(wsfolder.uri) + ".*";
+			// limiting search to same workspace folder
+			else // if (mode === ESwitchMode.Same_Workspace)
+				filename_search = "**/" + filename + ".*";
+			relativePattern = new vscode.RelativePattern(wsfolder, filename_search);
 		} else {
-			// search entire workspace
+			// search in all workspace folders
 			filename_search = "**/" + filename + ".*";
 		}
 
-		// don't include files excluded form the workspace
-		let search_config = vscode.workspace.getConfiguration( "search" );
-		let search_exclude_settings = search_config.get( "exclude" );
-		let exclude_files = "{";
+		// don't include files excluded from search in the workspace
+		// const search_exclude_settings = vscode.workspace.getConfiguration('search', absolute_uri).get('exclude');
+		const search_exclude_settings = vscode.workspace.getConfiguration('search', null).get('exclude');
+		const exclude_files = "{" +
+			Object.keys(search_exclude_settings)
+				.filter(key => search_exclude_settings[key]).toString() +
+			"}";
 
-		for ( var exclude in search_exclude_settings ) {
-			if( search_exclude_settings.hasOwnProperty( exclude ) ) {
-				exclude_files += exclude + ",";
-			}
-		}
+		let findFiles: Thenable<vscode.Uri[]>;
+		if (relativePattern)
+			findFiles = vscode.workspace.findFiles(relativePattern, exclude_files, 100);
+		else
+			findFiles = vscode.workspace.findFiles(filename_search, exclude_files, 100);
 
-		exclude_files += normalised_relative_filename_and_extension + "}";
-
-		var files = vscode.workspace.findFiles(filename_search, exclude_files, 100);
-
-		files.then((files) => {
+		findFiles.then((files: vscode.Uri[]) => {
 	        if (!files || files.length == 0) {
+				vscode.window.showInformationMessage('No files to switch found');
 				return;
 			}
 
-			// only want files whose name matches exactly
-			let exact_files = files.filter(file => path.basename(file.fsPath, path.extname(file.fsPath)) === filename);
+			// only want files whose name matches exactly and not the current one
+			const exact_files = files.filter(file =>
+					(file.fsPath !== absolute_filename) &&
+					path.basename(file.fsPath, path.extname(file.fsPath)) === filename);
+
 			if (!exact_files || exact_files.length == 0) {
+				vscode.window.showInformationMessage('No files to switch found');
 				return;
 			}
 
@@ -96,16 +103,14 @@ export function activate(context: vscode.ExtensionContext) {
 					});
 			} else {
 				// list and open only the file selected by user
-				let display_files = [];
-
-				for (let index = 0, file; index < exact_files.length; index++) {
-					file = exact_files[index];
-					display_files.push({
-						label: file.fsPath.substring(vscode.workspace.rootPath.length + 1),
-						description: file.fsPath,
-						filePath: file.fsPath
-					});
-				}
+				const display_files =
+					exact_files.map(file => ({
+							// label: file.fsPath.substring(vscode.workspace.rootPath.length + 1),
+							label: path.basename(file.fsPath),
+							description: file.fsPath,
+							filePath: file.fsPath
+						})
+					);
 
 				vscode.window.showQuickPick(display_files)
 					.then(val => {

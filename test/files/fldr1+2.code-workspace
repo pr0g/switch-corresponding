@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "fldr1"
+		},
+		{
+			"path": "fldr2"
+		}
+	],
+	"settings": {
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bower_components": true,
+			"**/.history": true
+		}
+	}
+}
