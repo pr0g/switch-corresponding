@@ -54,11 +54,12 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 			// limiting search to same directory (in same workspace folder)
-			if (mode === SwitchMode.Same_Dir)
+			if (mode === SwitchMode.Same_Dir) {
 				filename_search = getNormalisedRelativeFilename(wsfolder.uri) + ".*";
 			// limiting search to same workspace folder
-			else // if (mode === SwitchMode.Same_Workspace)
+			} else { // if (mode === SwitchMode.Same_Workspace)
 				filename_search = "**/" + filename + ".*";
+			}
 			relative_pattern = new vscode.RelativePattern(wsfolder, filename_search);
 		} else {
 			// search in all workspace folders
