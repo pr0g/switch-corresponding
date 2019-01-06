@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	// console.log('"switch-corresponding" now active');
 
-	const enum ESwitchMode {
+	const enum SwitchMode {
 		All = 0,
 		Same_Workspace,
 		Same_Dir
@@ -23,11 +23,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.switch_corresponding', () => switch_corresponding() ));
 	context.subscriptions.push(
-		vscode.commands.registerCommand('extension.switch_corresponding_same_dir', () => switch_corresponding(ESwitchMode.Same_Dir) ));
+		vscode.commands.registerCommand('extension.switch_corresponding_same_dir', () => switch_corresponding(SwitchMode.Same_Dir) ));
 	context.subscriptions.push(
-		vscode.commands.registerCommand('extension.switch_corresponding_same_workspace', () => switch_corresponding(ESwitchMode.Same_Workspace) ));
+		vscode.commands.registerCommand('extension.switch_corresponding_same_workspace', () => switch_corresponding(SwitchMode.Same_Workspace) ));
 
-	function switch_corresponding(mode: ESwitchMode = ESwitchMode.All ) {
+	function switch_corresponding(mode: SwitchMode = SwitchMode.All ) {
 
 		const absolute_uri = vscode.window.activeTextEditor.document.uri;
 		const absolute_filename = absolute_uri.fsPath;
@@ -38,27 +38,28 @@ export function activate(context: vscode.ExtensionContext) {
 			const fp = path.dirname(absolute_filename);
 
 			let res = fp.slice(wsfolder.fsPath.length);
-			if (res.charAt(0) === '\\' || '/')  // linux or windows
+			if (res.charAt(0) === '\\' || '/') { // linux or windows
 			    res = res.slice(1);
+			}
 			return path.join(res, filename).replace(/\\/g, '/'); // use only character / for glob usage
   		};
 
 		// the filename + search criteria to use for matching
 		let filename_search: string;
-		let relativePattern: vscode.RelativePattern;
-		if (mode !== ESwitchMode.All) {
+		let relative_pattern: vscode.RelativePattern;
+		if (mode !== SwitchMode.All) {
 			const wsfolder = vscode.workspace.getWorkspaceFolder(absolute_uri);
 			if (!wsfolder) {
 				vscode.window.showErrorMessage(`No workspace for ${absolute_filename}`);
 				return;
 			}
 			// limiting search to same directory (in same workspace folder)
-			if (mode === ESwitchMode.Same_Dir)
+			if (mode === SwitchMode.Same_Dir)
 				filename_search = getNormalisedRelativeFilename(wsfolder.uri) + ".*";
 			// limiting search to same workspace folder
-			else // if (mode === ESwitchMode.Same_Workspace)
+			else // if (mode === SwitchMode.Same_Workspace)
 				filename_search = "**/" + filename + ".*";
-			relativePattern = new vscode.RelativePattern(wsfolder, filename_search);
+			relative_pattern = new vscode.RelativePattern(wsfolder, filename_search);
 		} else {
 			// search in all workspace folders
 			filename_search = "**/" + filename + ".*";
@@ -78,11 +79,6 @@ export function activate(context: vscode.ExtensionContext) {
 		} else {
 			findFiles = vscode.workspace.findFiles(filename_search, exclude_files, 100);
 		}
-		
-			findFiles = vscode.workspace.findFiles(relativePattern, exclude_files, 100);
-		else
-			findFiles = vscode.workspace.findFiles(filename_search, exclude_files, 100);
-
 		findFiles.then((files: vscode.Uri[]) => {
 	        if (!files || files.length == 0) {
 				vscode.window.showInformationMessage('No files to switch found');
