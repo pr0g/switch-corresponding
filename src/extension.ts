@@ -73,7 +73,12 @@ export function activate(context: vscode.ExtensionContext) {
 			"}";
 
 		let findFiles: Thenable<vscode.Uri[]>;
-		if (relativePattern)
+		if (relative_pattern) {
+			findFiles = vscode.workspace.findFiles(relative_pattern, exclude_files, 100);
+		} else {
+			findFiles = vscode.workspace.findFiles(filename_search, exclude_files, 100);
+		}
+		
 			findFiles = vscode.workspace.findFiles(relativePattern, exclude_files, 100);
 		else
 			findFiles = vscode.workspace.findFiles(filename_search, exclude_files, 100);
