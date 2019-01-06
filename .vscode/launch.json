@@ -1,29 +1,34 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 {
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"configurations": [
 		{
 			"name": "Launch Extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}",
+					// "${workspaceRoot}/test/files/fldr1"
+					"${workspaceRoot}/test/files/fldr1+2.code-workspace"
+					// "${workspaceRoot}/test/files/.vscode/inside.code-workspace"
+			],
 			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outFiles": ["${workspaceRoot}/{out,node_modules}/**/*.js",
-   						 "!${workspaceRoot}/out/tests/**/*.js" ],
-			"preLaunchTask": "npm"
+   						 "!${workspaceRoot}/out/test/**/*.js" ]
 		},
 		{
-			"name": "Launch Tests",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}", "--extensionTestsPath=${workspaceRoot}/out/test" ],
-			"stopOnEntry": false,
-			"sourceMaps": true,
-			"outFiles": ["${workspaceRoot}/out/tests/**/*.js"],
-			"preLaunchTask": "npm"
-		}
+            "type": "extensionHost",
+            "request": "launch",
+            "name": "Launch Tests",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceRoot}",
+                "--extensionTestsPath=${workspaceRoot}/out/test"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+			"outFiles": ["${workspaceRoot}/out/test/**/*.js"]
+        }
 	]
 }
