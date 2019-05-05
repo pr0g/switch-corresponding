@@ -8,7 +8,7 @@ Bind your favourite key combination to this command: `extension.switch_correspon
 
 (I  like `Alt+O` from Visual Assist in Visual Studio :))
 
-** NOTE:** You must create a project for this to work.
+**NOTE:** You must create a project for this to work.
 The easiest way to do this is to `cd` to the directory you want as your root from terminal/command line, and then type `'code .'`.
 This will create a project with your current location as the workspace root and `switch-corresponding` will work as expected!
 Also if you haven't done this already, you may need to install `code` to your system PATH.
@@ -21,9 +21,12 @@ If you hit F1 from inside vscode, and start typing install, you should see an op
   * Once you have done that, open vscode with `vscode .` from the command line at the folder you cloned the repro into, open `src/extension.ts` and hit F5!
   * (you might find that you need to also run `tsc -p ./` to compile the extension.ts typescript file).
 
-** Note: No guarantees are made about if it will work 100% of the time! **
+**Note: No guarantees are made about if it will work 100% of the time!**
 
 ## Updates
+
+05/05/2019 - update npm dependencies
+
 06/01/2018 - merge PR from *zabel-xyz* to add support for multiple workspaces
 
 30/03/2017 - merge PR from *zabel-xyz* to fix (another) issue with vscode absolute/relative paths (on windows)
