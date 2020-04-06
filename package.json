@@ -39,11 +39,13 @@
 		"compile": "tsc -watch -p ./",
 		"compile:test": "tsc -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"update-vscode": "node ./node_modules/vscode/bin/install"
+		"update-vscode": "node ./node_modules/vscode/bin/install",
+		"preinstall": "npx npm-force-resolutions"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^10.17.18",
+		"minimist": "^1.2.5",
 		"mocha": "^5.2.0",
 		"typescript": "^3.8.3",
 		"vscode": "^1.1.36"
@@ -51,5 +53,8 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/pr0g/switch-corresponding"
+	},
+	"resolutions": {
+		"minimist": "^1.2.5"
 	}
 }
