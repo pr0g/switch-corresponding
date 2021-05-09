@@ -38,7 +38,6 @@
 		"vscode:prepublish": "tsc -p ./",
 		"compile": "tsc -watch -p ./",
 		"compile:test": "tsc -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
 		"update-vscode": "node ./node_modules/vscode/bin/install",
 		"preinstall": "npx npm-force-resolutions"
 	},
@@ -48,7 +47,8 @@
 		"@types/vscode": "^1.56.0",
 		"minimist": "^1.2.5",
 		"mocha": "^8.4.0",
-		"typescript": "^4.2.4"
+		"typescript": "^4.2.4",
+		"vscode-test": "^1.5.2"
 	},
 	"repository": {
 		"type": "git",
