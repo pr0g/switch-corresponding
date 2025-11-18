@@ -5,5 +5,6 @@ test/**
 src/**
 **/*.map
 .gitignore
-tsconfig.json
 vsc-extension-quickstart.md
+**/*.ts
+**/tsconfig.json
