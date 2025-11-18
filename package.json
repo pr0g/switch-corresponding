@@ -7,15 +7,10 @@
   "icon": "icon/switch-corresponding.png",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.106.1"
+    "vscode": "^1.105.1"
   },
   "categories": [
     "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.switch_corresponding",
-    "onCommand:extension.switch_corresponding_same_dir",
-    "onCommand:extension.switch_corresponding_same_workspace"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -44,17 +39,13 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.10.1",
-    "@types/vscode": "^1.106.1",
-    "minimist": "^1.2.8",
+    "@types/vscode": "^1.105.1",
     "mocha": "^11.7.5",
     "typescript": "^5.9.3",
-    "vscode-test": "^1.6.1"
+    "@vscode/test-electron": "^2.5.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/pr0g/switch-corresponding"
-  },
-  "resolutions": {
-    "minimist": "^1.2.5"
   }
 }
