@@ -25,6 +25,7 @@ __Note: No guarantees are made about if it will work 100% of the time!__
 
 ## Updates
 
+__2026/04/27__ - Fix dependabot vulnerabilities and update TypeScript version, along with some small fixes
 __2025/11/18__ - Update Visual Studio Code version, npm dependencies and code tidy-up (also use relative workspace path for file list)  
 __2021/05/09__ - Update Visual Studio Code version and npm dependencies  
 __2019/05/05__ - Update npm dependencies  
