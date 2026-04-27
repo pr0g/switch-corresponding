@@ -38,11 +38,11 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.6.0",
     "@types/vscode": "^1.105.0",
     "@vscode/test-electron": "^2.5.2",
     "mocha": "^11.3.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "repository": {
     "type": "git",

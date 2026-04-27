@@ -15,24 +15,30 @@ export function activate(context: vscode.ExtensionContext) {
   // the commandId parameter must match the command field in package.json
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.switch_corresponding", () =>
-      switchCorresponding(SwitchMode.All)
-    )
+      switchCorresponding(SwitchMode.All),
+    ),
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "extension.switch_corresponding_same_dir",
-      () => switchCorresponding(SwitchMode.SameDir)
-    )
+      () => switchCorresponding(SwitchMode.SameDir),
+    ),
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "extension.switch_corresponding_same_workspace",
-      () => switchCorresponding(SwitchMode.SameWorkspace)
-    )
+      () => switchCorresponding(SwitchMode.SameWorkspace),
+    ),
   );
 
   function switchCorresponding(mode: SwitchMode) {
-    const absoluteUri = vscode.window.activeTextEditor.document.uri;
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showInformationMessage("No active text editor.");
+      return;
+    }
+
+    const absoluteUri = editor.document.uri;
     const filePath = absoluteUri.fsPath;
     const filename = path.basename(filePath, path.extname(filePath));
 
@@ -40,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
       const folder = path.dirname(filePath);
       let relativePath = folder.slice(workspaceFolder.fsPath.length);
       // remove leading separator
-      if (relativePath.charAt(0) === "\\" || "/") {
+      if (relativePath.charAt(0) === "\\" || relativePath.charAt(0) === "/") {
         // linux or windows
         relativePath = relativePath.slice(1);
       }
@@ -50,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // the filename + search criteria to use for matching
     let filenameSearch: string;
-    let relativePattern: vscode.RelativePattern;
+    let relativePattern: vscode.RelativePattern | undefined = undefined;
     if (mode !== SwitchMode.All) {
       const workspaceFolder = vscode.workspace.getWorkspaceFolder(absoluteUri);
       if (!workspaceFolder) {
@@ -68,7 +74,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
       relativePattern = new vscode.RelativePattern(
         workspaceFolder,
-        filenameSearch
+        filenameSearch,
       );
     } else {
       // search in all workspace folders
@@ -76,9 +82,11 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     // don't include files excluded from search in the workspace
-    const searchExcludeSettings = vscode.workspace
-      .getConfiguration("search", null)
-      .get("exclude");
+    const searchExcludeSettings =
+      vscode.workspace
+        .getConfiguration("search", null)
+        .get<Record<string, boolean>>("exclude") ?? {};
+
     const excludeFiles =
       "{" +
       Object.keys(searchExcludeSettings)
@@ -91,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
     foundFiles = vscode.workspace.findFiles(
       relativePattern ?? filenameSearch,
       excludeFiles,
-      maxResults
+      maxResults,
     );
     foundFiles.then(
       (files: vscode.Uri[]) => {
@@ -104,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
         const exactFiles = files.filter(
           (file) =>
             file.fsPath !== filePath &&
-            path.basename(file.fsPath, path.extname(file.fsPath)) === filename
+            path.basename(file.fsPath, path.extname(file.fsPath)) === filename,
         );
         if (!exactFiles || exactFiles.length == 0) {
           vscode.window.showInformationMessage(NoSwitchMessage);
@@ -115,10 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.workspace
             .openTextDocument(exactFiles[0].fsPath)
             .then((textDoc) => {
-              vscode.window.showTextDocument(
-                textDoc,
-                vscode.window.activeTextEditor.viewColumn
-              );
+              vscode.window.showTextDocument(textDoc, editor.viewColumn);
             });
         } else {
           // list and open only the file selected by the user
@@ -132,10 +137,7 @@ export function activate(context: vscode.ExtensionContext) {
               vscode.workspace
                 .openTextDocument(file.filePath)
                 .then((textDoc) => {
-                  vscode.window.showTextDocument(
-                    textDoc,
-                    vscode.window.activeTextEditor.viewColumn
-                  );
+                  vscode.window.showTextDocument(textDoc, editor.viewColumn);
                 });
             }
           });
@@ -143,7 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
       },
       (reason) => {
         console.warn(reason);
-      }
+      },
     );
   }
 }
